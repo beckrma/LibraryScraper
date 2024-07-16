@@ -24,4 +24,17 @@ def find_location_info(soup_url: str):
     copies = other.find('div', class_='accordion-inner')
     need = copies.find('table', class_='table table-striped')
     received = need.find_all('td')
-    return received
+    needed_text = []
+    for lines in received:
+        needed_text.append(lines.text)
+    return needed_text
+
+
+def extract_information(infos : list):
+    extraction = []
+    for info in infos:
+        if not info:
+            next
+        else:
+            extraction.append(info.text.strip())
+    return extraction
