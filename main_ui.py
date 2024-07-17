@@ -1,5 +1,5 @@
 import making_request as m
-
+from book_class import Book
 
 
 
@@ -7,11 +7,12 @@ def main():
     url = input('Enter Orange Library URL Ending with "Record": ')
     request = m.make_request(url)
     organized_scraped = m.soup_organize(request)
-    info_list = m.find_main_info(organized_scraped)
+    info_soup = m.find_main_info(organized_scraped)
     location_soup = m.find_location_info(organized_scraped)
-    info_soup = m.extract_information(info_list)
-    print(info_soup)
-    print(location_soup)
+    my_book = Book(info_soup[0], info_soup[1], info_soup[5])
+    title = my_book.get_title()
+    print(title)
+
 
 
 

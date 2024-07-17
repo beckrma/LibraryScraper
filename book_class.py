@@ -6,3 +6,12 @@ class Book:
         self.location = 'None'
         self.call_number = 0
         self.status = 'N/A'
+
+    def get_title(self):
+        return self.__title
+    
+    def get_author(self):
+        return self.__author
+    
+    def get_isbn(self):
+        return self.__isbn
