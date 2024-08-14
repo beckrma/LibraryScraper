@@ -1,11 +1,11 @@
 class Book:
-    def __init__(self, title : str, author : str, isbn : str):
+    def __init__(self, title : str, author : str, isbn : str, location : str, status : str, callnum : str):
         self.__title = title
         self.__author = author
         self.__isbn = isbn
-        self.location = 'None'
-        self.call_number = 0
-        self.status = 'N/A'
+        self.location = location
+        self.call_number = callnum
+        self.status = status
 
     def get_title(self):
         return self.__title
