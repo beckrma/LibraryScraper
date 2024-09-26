@@ -1,14 +1,34 @@
-import requests as r
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 
 def make_request(url: str):
-    current_request = r.get(url)
-    print(f'Request Code: {current_request}')
-    return current_request  
+    chrome_options = webdriver.ChromeOptions()
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.set_page_load_timeout(30)
+    driver.get(url)
+    html_re = driver.page_source
+    return html_re, driver
 
 def soup_organize(request):
-    soup = BeautifulSoup(request.content, 'html.parser') 
+    soup = BeautifulSoup(request, 'html.parser') 
     return soup
+
+def extract_records(soup_url: str):
+    records = []
+    find = soup_url.find('div', id="searchInfo")
+    for num in range(1,21):
+        if num%2 != 0:
+            class_name = f"result record{num}"
+            record = soup_url.find('div', class_= class_name)
+            records.append(record)
+        else:
+            class_name = f"result alt record{num}"
+            record = soup_url.find('div', class_= class_name)
+            records.append(record)
+    return records
 
 def find_main_info(soup_url: str):
     texts = soup_url.find('div', id= 'main-content')
