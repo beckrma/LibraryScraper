@@ -1,24 +1,33 @@
+import requests as r
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 
 def make_request(url: str):
+    current_request = r.get(url)
+    return current_request
+
+def make_web(url: str):
     chrome_options = webdriver.ChromeOptions()
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.set_page_load_timeout(30)
     driver.get(url)
     html_re = driver.page_source
-    return html_re, driver
+    driver.quit()
+    return html_re
 
 def soup_organize(request):
-    soup = BeautifulSoup(request, 'html.parser') 
-    return soup
+    try:
+        soup = BeautifulSoup(request.content, 'html.parser') 
+        return soup
+    except AttributeError:
+        soup = BeautifulSoup(request, 'html.parser')
+        return soup
 
 def extract_records(soup_url: str):
     records = []
-    find = soup_url.find('div', id="searchInfo")
     for num in range(1,21):
         if num%2 != 0:
             class_name = f"result record{num}"
@@ -30,18 +39,29 @@ def extract_records(soup_url: str):
             records.append(record)
     return records
 
+def extract_book_links(record_list: list):
+    link_list = []
+    for records in record_list:
+        links = records.find('a', class_= 'btn btn-xs btn-primary btn-wrap')
+        if links is None:
+            continue
+        href_val = links['href']
+        if len(href_val) == 0:
+            continue
+        link_list.append(f'https://copl.aspendiscovery.org/{href_val}')
+    return link_list
+
 def find_main_info(soup_url: str):
-    texts = soup_url.find('div', id= 'main-content')
+    texts = soup_url.find('div', id='main-content')
     pre_pre_title = texts.find('div', role='main')
     pre_title = pre_pre_title.find('div', class_='col-xs-12')
     title = pre_title.find('h1')
     actual_title = ''.join(title.find_all(text=True, recursive=False)).strip()
-    specifics = texts.find('div', id='record-details-column')
-    needs = specifics.find_all('div', class_='row')
-    needed_information = []
-    for lines in needs:
-        needed_information.append(lines.find('div', class_='result-value'))
-    extracted = extract_information(needed_information)
+    author = soup_url.find('div', class_='result-value col-sm-8 col-xs-12')
+    isbn = soup_url.find('div', text='ISBN')
+    isbn_value = isbn.find_next_sibling('div', class_='result-value')
+    needed_info = [author, isbn_value]
+    extracted = extract_information(needed_info)
     extracted.insert(0, actual_title)
     return extracted
 
