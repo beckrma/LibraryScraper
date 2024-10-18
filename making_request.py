@@ -1,3 +1,4 @@
+# File for scraping information and making initial request into site
 import requests as r
 from bs4 import BeautifulSoup
 from selenium import webdriver

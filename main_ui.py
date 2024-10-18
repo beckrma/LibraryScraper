@@ -5,7 +5,7 @@ from book_class import Book
 
 
 def main():
-    url = take_input() # replace with page link
+    url = take_input()
     request = m.make_web(url)
     organized_scraped = m.soup_organize(request)
     needed_records = m.extract_records(organized_scraped)
